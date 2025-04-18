@@ -3,17 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-  const [isLoading, setIsLoading] = useState(false);
+  const { register, error: authError, isLoading } = useAuth();
   const [error, setError] = useState("");
   
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsLoading(true);
     setError("");
     
     const formData = new FormData(event.currentTarget);
@@ -24,23 +22,15 @@ export default function RegisterPage() {
     
     if (password !== confirmPassword) {
       setError("Passwords do not match");
-      setIsLoading(false);
       return;
     }
     
     try {
-      const response = await axios.post(backendUrl + "/api/user/register", {email, password, username});
-      
-      console.log("Registration successful:", response.data);
-      router.push("/auth/login"); 
+      await register(username, email, password);
+      // The redirect will happen inside the register function
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Registration failed");
-      } else {
-        setError(err instanceof Error ? err.message : "Something went wrong");
-      }
-    } finally {
-      setIsLoading(false);
+      // Error is already handled in the auth context
+      setError(authError || "Registration failed");
     }
   }
 
@@ -56,9 +46,9 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {error && (
+        {(error || authError) && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-            <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm text-red-700">{error || authError}</p>
           </div>
         )}
 
@@ -144,9 +134,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="text-sm text-black">
+            <div className="text-sm">
               Already have an account?{" "}
-              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-gray-700">
+              <Link href="/auth/login" className="font-medium text-black hover:text-gray-700">
                 Sign in
               </Link>
             </div>

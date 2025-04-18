@@ -3,14 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "../context/AuthContext";
 
-// You can update this interface later based on authentication status
-interface NavbarProps {
-  isAuthenticated?: boolean;
-}
-
-export default function Navbar({ isAuthenticated = false }: NavbarProps) {
+export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
 
   return (
     <nav className="bg-white shadow-md relative z-10">
@@ -41,9 +38,17 @@ export default function Navbar({ isAuthenticated = false }: NavbarProps) {
                 <Link href="/profile" className="text-gray-700 hover:text-black px-3 py-2 font-medium">
                   Profile
                 </Link>
-                <button className="text-gray-700 hover:text-black px-3 py-2 font-medium">
+                <button 
+                  onClick={logout}
+                  className="text-gray-700 hover:text-black px-3 py-2 font-medium"
+                >
                   Sign Out
                 </button>
+                <div className="flex items-center ml-3">
+                  <span className="text-sm font-medium text-gray-900">
+                    {user?.username}
+                  </span>
+                </div>
               </>
             ) : (
               <>
@@ -77,7 +82,7 @@ export default function Navbar({ isAuthenticated = false }: NavbarProps) {
                 </svg>
               ) : (
                 /* Icon when menu is open */
-                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 24 24" stroke="currentColor">
+                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               )}
@@ -108,7 +113,13 @@ export default function Navbar({ isAuthenticated = false }: NavbarProps) {
                 <Link href="/profile" className="block pl-3 pr-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100">
                   Profile
                 </Link>
-                <button className="block w-full text-left pl-3 pr-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100">
+                <div className="block pl-3 pr-4 py-2 text-base font-medium text-gray-700 border-t border-gray-200">
+                  Signed in as: {user?.username}
+                </div>
+                <button 
+                  onClick={logout}
+                  className="block w-full text-left pl-3 pr-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-100"
+                >
                   Sign Out
                 </button>
               </>

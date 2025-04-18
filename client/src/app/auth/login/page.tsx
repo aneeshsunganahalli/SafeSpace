@@ -3,17 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, error: authError, isLoading } = useAuth();
   const [error, setError] = useState("");
   
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsLoading(true);
     setError("");
     
     const formData = new FormData(event.currentTarget);
@@ -21,18 +19,11 @@ export default function LoginPage() {
     const password = formData.get("password") as string;
     
     try {
-      const response = await axios.post(backendUrl + "/api/user/login", {email, password});
-      
-      console.log("Login successful:", response.data);
-      router.push("/"); 
+      await login(email, password);
+      // The redirect will happen inside the login function
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Login failed");
-      } else {
-        setError(err instanceof Error ? err.message : "Something went wrong");
-      }
-    } finally {
-      setIsLoading(false);
+      // Error is already handled in the auth context
+      setError(authError || "An error occurred during login");
     }
   }
 
@@ -48,9 +39,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {error && (
+        {(error || authError) && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-            <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm text-red-700">{error || authError}</p>
           </div>
         )}
 
@@ -109,9 +100,9 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="text-sm text-black">
+            <div className="text-sm">
               Don't have an account?{" "}
-              <Link href="/auth/register" className="font-medium text-blue-600 hover:text-gray-700">
+              <Link href="/auth/register" className="font-medium text-black hover:text-gray-700">
                 Sign up
               </Link>
             </div>
