@@ -1,5 +1,6 @@
 import axios from 'axios';
-import JournalEntry from '../models/JournalEntry.js';
+import JournalEntry from '../models/journalEntryModel.js';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Get all journal entries for a user
 const getJournalEntries = async (req, res) => {
@@ -142,7 +143,7 @@ const getJournalInsights = async (req, res) => {
   }
 };
 
-// Process journal entry with LLM
+// Process journal entry with Gemini
 async function processEntryWithLLM(entryId) {
   try {
     // Get the entry
@@ -150,13 +151,17 @@ async function processEntryWithLLM(entryId) {
     
     if (!entry) return;
     
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.error('OpenAI API key not configured');
+      console.error('Gemini API key not configured');
       return;
     }
     
-    // Prepare the prompt
+    // Initialize the Gemini API client
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    
+    // Prepare the prompt - add specific instructions about JSON format
     const prompt = `
       Below is a journal entry from someone reflecting on their day.
       
@@ -168,34 +173,71 @@ async function processEntryWithLLM(entryId) {
       2. Identify any potential negative thought patterns (catastrophizing, black-and-white thinking, etc.) (max 3)
       3. Suggest 2-3 specific coping strategies or perspective shifts that might help
       
-      Format your response as a JSON object with these keys: supportiveResponse, identifiedPatterns, suggestedStrategies
+      Format your response as a valid, parseable JSON object with these keys: supportiveResponse, identifiedPatterns, suggestedStrategies.
+      Keep all values as simple strings without any special formatting or line breaks inside the strings.
+      Make sure the JSON is correctly formatted with double quotes around keys and string values.
     `;
     
-    // Call OpenAI API
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: 'You are a supportive, empathetic mental health assistant.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7
-    }, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      }
+    // Call Gemini API with safety settings
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1024,
+      },
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_HATE_SPEECH",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        }
+      ]
     });
     
-    // Parse the response
-    const content = response.data.choices[0].message.content;
+    const response = result.response;
+    let content = response.text();
+    
+    // Improved JSON parsing with better error handling
     let analysis;
     try {
+      // Extract the JSON part if it's wrapped in markdown code blocks (```json...```)
+      const jsonMatch = content.match(/```json\s*({[\s\S]*?})\s*```/);
+      if (jsonMatch && jsonMatch[1]) {
+        content = jsonMatch[1];
+      }
+      
+      // Clean up the content to ensure it's valid JSON
+      // Remove any potential control characters and normalize quotes
+      content = content
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // Remove control characters
+        .replace(/[\u2018\u2019]/g, "'") // Normalize single quotes
+        .replace(/[\u201C\u201D]/g, '"'); // Normalize double quotes
+      
       analysis = JSON.parse(content);
+      
+      // Validate expected structure
+      if (!analysis.supportiveResponse || !analysis.identifiedPatterns || !analysis.suggestedStrategies) {
+        throw new Error('Response missing required fields');
+      }
     } catch (err) {
-      console.error('Failed to parse LLM response:', content);
+      console.error('Failed to parse Gemini response:', content);
+      console.error('Parse error:', err.message);
+      
+      // Create a fallback analysis if parsing fails
       analysis = {
         supportiveResponse: "Thank you for sharing your thoughts. I'm here to support you on your journey.",
-        identifiedPatterns: [],
+        identifiedPatterns: ["Unable to analyze patterns at this time"],
         suggestedStrategies: ["Take some time for self-care today."]
       };
     }
@@ -209,7 +251,7 @@ async function processEntryWithLLM(entryId) {
     });
     
   } catch (error) {
-    console.error('Error in LLM processing:', error);
+    console.error('Error in Gemini processing:', error);
     throw error;
   }
 }

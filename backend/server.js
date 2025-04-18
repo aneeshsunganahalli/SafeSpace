@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRouter from "./routes/userRoutes.js";
+import journalRouter from "./routes/journalRoutes.js"; // Add this import
 
 dotenv.config();
 
@@ -26,12 +27,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/user", userRouter);
-
+app.use("/api/journal", journalRouter); // Add this line to use journal routes
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });
 });
-
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -1,12 +1,12 @@
 import express from 'express';
-import { verifyToken } from '../middlewares/verifyToken';
+import  verifyToken  from '../middlewares/verifyToken.js';
 import {
   getJournalEntries,
   createJournalEntry,
   getJournalInsights,
   getJournalEntry,
   updateJournalEntry,
-  deleteJournalEntry,
+  deleteJournalEntry
 } from '../controllers/journalController.js';
 
 const router = express.Router();
