@@ -24,14 +24,17 @@ export default function JournalInsights() {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
   const [insights, setInsights] = useState<{
     moodDistribution: MoodDistribution[];
     moodTrend: MoodTrend[];
     commonPatterns: CommonPattern[];
+    unprocessedCount: number;
   }>({
     moodDistribution: [],
     moodTrend: [],
     commonPatterns: [],
+    unprocessedCount: 0
   });
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
@@ -41,19 +44,43 @@ export default function JournalInsights() {
 
   const fetchInsights = async () => {
     try {
+      setLoading(true);
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       };
 
+      console.log("Fetching insights with token:", token ? "Token exists" : "No token");
       const response = await axios.get(`${backendUrl}/api/journal/insights`, config);
+      console.log("Insights data received:", response.data);
       setInsights(response.data);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching journal insights:", err);
       setError("Failed to load insights. Please try again later.");
       setLoading(false);
+    }
+  };
+
+  const handleRefreshAnalysis = async () => {
+    try {
+      setRefreshing(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+      
+      await axios.post(`${backendUrl}/api/journal/reprocess`, {}, config);
+      
+      // Fetch updated insights
+      await fetchInsights();
+      setRefreshing(false);
+    } catch (err) {
+      console.error("Error reprocessing journal entries:", err);
+      setError("Failed to reprocess journal entries. Please try again later.");
+      setRefreshing(false);
     }
   };
 
@@ -125,7 +152,85 @@ export default function JournalInsights() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">Your Mental Health Insights</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">Your Mental Health Insights</h2>
+        <div className="space-x-2">
+          {/* Force reprocess all entries button */}
+          <button
+            onClick={() => {
+              // First mark all entries as unprocessed
+              const forceReprocessAll = async () => {
+                try {
+                  setRefreshing(true);
+                  const config = {
+                    headers: {
+                      Authorization: `Bearer ${token}`
+                    }
+                  };
+                  
+                  // Force reprocessing of all entries by passing forceAll=true
+                  console.log("Forcing reprocess of all entries");
+                  await axios.post(`${backendUrl}/api/journal/reprocess`, { forceAll: true }, config);
+                  
+                  // Fetch updated insights
+                  await fetchInsights();
+                  setRefreshing(false);
+                } catch (err) {
+                  console.error("Error reprocessing all journal entries:", err);
+                  setError("Failed to reprocess journal entries. Please try again later.");
+                  setRefreshing(false);
+                }
+              };
+              forceReprocessAll();
+            }}
+            disabled={refreshing}
+            className="flex items-center py-2 px-4 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 disabled:opacity-50"
+          >
+            {refreshing ? (
+              <>
+                <span className="mr-2 inline-block w-4 h-4 border-2 border-t-transparent border-gray-800 rounded-full animate-spin"></span>
+                Processing...
+              </>
+            ) : (
+              <>
+                Force Reprocess All
+              </>
+            )}
+          </button>
+
+          {insights.unprocessedCount > 0 && (
+            <button
+              onClick={handleRefreshAnalysis}
+              disabled={refreshing}
+              className="flex items-center py-2 px-4 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 disabled:opacity-50"
+            >
+              {refreshing ? (
+                <>
+                  <span className="mr-2 inline-block w-4 h-4 border-2 border-t-transparent border-gray-800 rounded-full animate-spin"></span>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  Analyze {insights.unprocessedCount} Unprocessed {insights.unprocessedCount === 1 ? 'Entry' : 'Entries'}
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Warning for unprocessed entries */}
+      {insights.unprocessedCount > 0 && !refreshing && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-md">
+          <p className="text-sm text-yellow-800">
+            <strong>Note:</strong> {insights.unprocessedCount} of your journal entries haven't been fully analyzed.
+            Click "Analyze Unprocessed Entries" to process them and get more complete insights.
+          </p>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Mood Distribution */}
@@ -206,6 +311,15 @@ export default function JournalInsights() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+        
+        {insights.commonPatterns.length === 0 && insights.unprocessedCount === 0 && (
+          <div className="bg-white p-5 rounded-lg shadow-lg md:col-span-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Common Thought Patterns</h3>
+            <p className="text-gray-600">
+              No recurring thought patterns have been identified yet. Continue journaling regularly to help identify patterns in your thinking.
+            </p>
           </div>
         )}
       </div>

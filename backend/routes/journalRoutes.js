@@ -6,7 +6,9 @@ import {
   getJournalInsights,
   getJournalEntry,
   updateJournalEntry,
-  deleteJournalEntry
+  deleteJournalEntry,
+  reprocessJournalEntries,
+  reprocessSingleEntry
 } from '../controllers/journalController.js';
 
 const router = express.Router();
@@ -18,8 +20,10 @@ router.use(verifyToken);
 router.get('/', getJournalEntries);
 router.post('/', createJournalEntry);
 router.get('/insights', getJournalInsights);
+router.post('/reprocess', reprocessJournalEntries);
 router.get('/:id', getJournalEntry);
 router.put('/:id', updateJournalEntry);
 router.delete('/:id', deleteJournalEntry);
+router.post('/:id/reprocess', reprocessSingleEntry);
 
 export default router;

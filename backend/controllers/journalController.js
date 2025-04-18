@@ -108,11 +108,63 @@ const deleteJournalEntry = async (req, res) => {
 // Get journal insights
 const getJournalInsights = async (req, res) => {
   try {
-    // Get mood distribution
-    const moodDistribution = await JournalEntry.aggregate([
+    // Get entries to work with
+    const entries = await JournalEntry.find({ userId: req.user.id });
+    
+    // Check if we have any entries
+    if (entries.length === 0) {
+      return res.status(200).json({
+        moodDistribution: [],
+        moodTrend: [],
+        commonPatterns: [],
+        unprocessedCount: 0
+      });
+    }
+    
+    // Map mood scores to labels if labels are missing
+    const moodMap = {
+      '1-2': 'Very Negative',
+      '3-4': 'Negative', 
+      '5-6': 'Neutral',
+      '7-8': 'Positive',
+      '9-10': 'Very Positive'
+    };
+    
+    // Calculate mood distribution manually if necessary
+    let moodDistribution = await JournalEntry.aggregate([
       { $match: { userId: req.user.id } },
-      { $group: { _id: "$mood.label", count: { $sum: 1 } } }
+      { $group: { _id: "$mood.label", count: { $sum: 1 } } },
+      { $match: { _id: { $ne: null } } } // Filter out null labels
     ]);
+    
+    // If mood distribution is empty, calculate based on scores
+    if (moodDistribution.length === 0) {
+      // Initialize counters for each mood range
+      const moodCounts = {
+        'Very Negative': 0,
+        'Negative': 0,
+        'Neutral': 0,
+        'Positive': 0,
+        'Very Positive': 0
+      };
+      
+      // Count entries in each mood range
+      entries.forEach(entry => {
+        if (!entry.mood || !entry.mood.score) return;
+        
+        const score = entry.mood.score;
+        if (score <= 2) moodCounts['Very Negative']++;
+        else if (score <= 4) moodCounts['Negative']++;
+        else if (score <= 6) moodCounts['Neutral']++;
+        else if (score <= 8) moodCounts['Positive']++;
+        else moodCounts['Very Positive']++;
+      });
+      
+      // Convert to expected format for frontend
+      moodDistribution = Object.entries(moodCounts)
+        .filter(([_, count]) => count > 0) // Only include moods that have entries
+        .map(([label, count]) => ({ _id: label, count }));
+    }
     
     // Get recent mood trends
     const twoWeeksAgo = new Date();
@@ -126,20 +178,97 @@ const getJournalInsights = async (req, res) => {
     // Get common patterns identified
     const commonPatterns = await JournalEntry.aggregate([
       { $match: { userId: req.user.id, 'analysis.processed': true } },
-      { $unwind: "$analysis.identifiedPatterns" },
+      { $unwind: { path: "$analysis.identifiedPatterns", preserveNullAndEmptyArrays: false } },
       { $group: { _id: "$analysis.identifiedPatterns", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 5 }
     ]);
     
+    // Get count of unprocessed entries
+    const unprocessedCount = await JournalEntry.countDocuments({
+      userId: req.user.id,
+      'analysis.processed': { $ne: true }
+    });
+    
     res.status(200).json({
       moodDistribution,
       moodTrend,
-      commonPatterns
+      commonPatterns,
+      unprocessedCount
     });
   } catch (error) {
     console.error('Error generating journal insights:', error);
     res.status(500).json({ message: 'Failed to generate journal insights' });
+  }
+};
+
+// Reprocess journal entries with AI that haven't been processed yet
+const reprocessJournalEntries = async (req, res) => {
+  try {
+    // Find entries that need processing
+    const entries = await JournalEntry.find({
+      userId: req.user.id,
+      'analysis.processed': { $ne: true }
+    });
+    
+    if (entries.length === 0) {
+      return res.status(200).json({ 
+        message: 'No entries to process',
+        processedCount: 0
+      });
+    }
+    
+    // Process entries - do this in sequence to avoid overloading the API
+    let processedCount = 0;
+    
+    // Process up to 10 entries to avoid timeouts
+    const entriesToProcess = entries.slice(0, 10);
+    
+    for (const entry of entriesToProcess) {
+      try {
+        await processEntryWithLLM(entry._id);
+        processedCount++;
+      } catch (error) {
+        console.error(`Error processing entry ${entry._id}:`, error);
+        // Continue with other entries even if one fails
+      }
+    }
+    
+    res.status(200).json({
+      message: `Successfully processed ${processedCount} entries`,
+      processedCount,
+      remainingCount: entries.length - processedCount
+    });
+    
+  } catch (error) {
+    console.error('Error reprocessing journal entries:', error);
+    res.status(500).json({ message: 'Failed to reprocess journal entries' });
+  }
+};
+
+// Reprocess a specific journal entry with AI
+const reprocessSingleEntry = async (req, res) => {
+  try {
+    // Check if the entry exists and belongs to the user
+    const entry = await JournalEntry.findOne({
+      _id: req.params.id,
+      userId: req.user.id
+    });
+    
+    if (!entry) {
+      return res.status(404).json({ message: 'Journal entry not found' });
+    }
+    
+    // Process the entry with LLM
+    await processEntryWithLLM(entry._id);
+    
+    res.status(200).json({ 
+      message: 'Journal entry analysis started',
+      entryId: entry._id
+    });
+  } catch (error) {
+    console.error('Error reprocessing journal entry:', error);
+    res.status(500).json({ message: 'Failed to reprocess journal entry' });
   }
 };
 
@@ -159,7 +288,7 @@ async function processEntryWithLLM(entryId) {
     
     // Initialize the Gemini API client
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     // Prepare the prompt - add specific instructions about JSON format
     const prompt = `
@@ -262,5 +391,7 @@ export {
   createJournalEntry,
   updateJournalEntry,
   deleteJournalEntry,
-  getJournalInsights
+  getJournalInsights,
+  reprocessJournalEntries,
+  reprocessSingleEntry
 };

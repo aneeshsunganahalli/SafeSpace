@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import JournalEntryForm from "./JournalEntryForm";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface JournalEntryProps {
   entry: {
@@ -21,7 +24,7 @@ interface JournalEntryProps {
     };
   };
   onBack: () => void;
-  onDelete: () => void;
+  onDelete: (id: string) => void;  // Updated to accept an ID parameter
   onRefresh: () => void;
 }
 
@@ -31,208 +34,197 @@ export default function JournalEntryDetail({
   onDelete,
   onRefresh,
 }: JournalEntryProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const { token } = useAuth();
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingError, setProcessingError] = useState("");
+  const router = useRouter();
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+  // Format date for display
+  const formattedDate = useMemo(() => {
+    return new Date(entry.date).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
+  }, [entry.date]);
+
+  // Extract tags from entry
+  const tags = useMemo(() => entry.tags || [], [entry.tags]);
+
+  const handleEdit = () => {
+    // Navigate to edit page with entry data
+    router.push(`/journal/edit/${entry._id}`);
   };
 
-  const getMoodEmoji = (label: string) => {
-    switch (label) {
-      case "Very Negative":
-        return "😢";
-      case "Negative":
-        return "😕";
-      case "Neutral":
-        return "😐";
-      case "Positive":
-        return "🙂";
-      case "Very Positive":
-        return "😄";
-      default:
-        return "😐";
+  const handleReprocessAnalysis = async () => {
+    try {
+      setIsProcessing(true);
+      setProcessingError("");
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      await axios.post(`${backendUrl}/api/journal/${entry._id}/reprocess`, {}, config);
+
+      // Refresh the entry data
+      if (onRefresh) {
+        onRefresh();
+      }
+
+      setIsProcessing(false);
+    } catch (error) {
+      console.error('Error reprocessing entry:', error);
+      setProcessingError("Failed to analyze entry. Please try again later.");
+      setIsProcessing(false);
     }
   };
-
-  const getMoodColor = (label: string) => {
-    switch (label) {
-      case "Very Negative":
-        return "bg-red-100 text-red-800";
-      case "Negative":
-        return "bg-orange-100 text-orange-800";
-      case "Neutral":
-        return "bg-gray-100 text-gray-800";
-      case "Positive":
-        return "bg-green-100 text-green-800";
-      case "Very Positive":
-        return "bg-emerald-100 text-emerald-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  // Handle edit completion
-  const handleEditComplete = () => {
-    setIsEditing(false);
-    onRefresh();
-  };
-
-  if (isEditing) {
-    return (
-      <div>
-        <div className="mb-4">
-          <button
-            onClick={() => setIsEditing(false)}
-            className="flex items-center text-gray-600 hover:text-black"
-          >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Cancel Editing
-          </button>
-        </div>
-
-        <JournalEntryForm
-          existingEntry={entry}
-          onSave={handleEditComplete}
-        />
-      </div>
-    );
-  }
 
   return (
-    <div>
-      <div className="mb-4">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="flex justify-between items-center p-5 bg-gray-50 border-b border-gray-200">
         <button
           onClick={onBack}
-          className="flex items-center text-gray-600 hover:text-black"
+          className="text-gray-600 hover:text-gray-900 flex items-center"
         >
-          <svg
-            className="w-4 h-4 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
+          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
           </svg>
-          Back to Entries
+          Back
         </button>
+
+        <div className="flex gap-2">
+          <button
+            onClick={handleEdit}
+            className="py-1 px-3 text-sm bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(entry._id)}
+            className="py-1 px-3 text-sm bg-red-50 text-red-600 rounded hover:bg-red-100"
+          >
+            Delete
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="p-5 border-b border-gray-200">
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                Journal Entry
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {formatDate(entry.date)}
-              </p>
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setIsEditing(true)}
-                className="p-2 text-gray-500 hover:text-gray-700"
-                aria-label="Edit entry"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-              </button>
-              <button
-                onClick={onDelete}
-                className="p-2 text-gray-500 hover:text-red-600"
-                aria-label="Delete entry"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-              </button>
-            </div>
+      <div>
+        <div className="p-5">
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Journal Entry
+            </h2>
+            <span className="text-sm text-gray-500">{formattedDate}</span>
           </div>
 
-          {/* Mood and Tags */}
-          <div className="flex flex-wrap items-center gap-2 mt-3">
-            <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getMoodColor(
-                entry.mood.label
-              )}`}
-            >
-              {entry.mood.label} {getMoodEmoji(entry.mood.label)}
-            </span>
-            {entry.tags.map((tag) => (
+          {/* Mood indicator */}
+          {entry.mood && entry.mood.label && (
+            <div className="mb-4 flex items-center">
               <span
-                key={tag}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-              >
-                {tag}
+                className={`inline-block rounded-full w-3 h-3 mr-2 ${
+                  entry.mood.label === "Very Positive"
+                    ? "bg-emerald-500"
+                    : entry.mood.label === "Positive"
+                    ? "bg-green-400"
+                    : entry.mood.label === "Neutral"
+                    ? "bg-gray-400"
+                    : entry.mood.label === "Negative"
+                    ? "bg-orange-400"
+                    : "bg-red-500"
+                }`}
+              ></span>
+              <span className="text-gray">
+                {entry.mood.label === "Very Positive" 
+                  ? "😄 Very Positive" 
+                  : entry.mood.label === "Positive" 
+                  ? "🙂 Positive" 
+                  : entry.mood.label === "Neutral" 
+                  ? "😐 Neutral" 
+                  : entry.mood.label === "Negative" 
+                  ? "🙁 Negative" 
+                  : "😞 Very Negative"}
               </span>
-            ))}
-          </div>
-        </div>
+              {entry.mood.score && (
+                <span className="text-gray-400 text-sm ml-2">
+                  ({entry.mood.score}/10)
+                </span>
+              )}
+            </div>
+          )}
 
-        {/* Content */}
-        <div className="p-5 bg-white">
-          <div className="prose max-w-none">
-            {entry.content.split("\n").map((paragraph, idx) => (
-              <p key={idx} className="mb-4 text-gray-700">
-                {paragraph}
-              </p>
-            ))}
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-700"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Journal content */}
+          <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
+            <p className="text-gray-700 whitespace-pre-wrap">{entry.content}</p>
           </div>
         </div>
 
         {/* AI Analysis */}
-        {entry.analysis.processed && (
+        {entry.analysis && (
           <div className="p-5 bg-gray-50 border-t border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">
-              AI Insights
-            </h3>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-medium text-gray-900">
+                AI Insights
+              </h3>
+
+              {/* Reprocess button */}
+              {!entry.analysis.processed || processingError ? (
+                <button
+                  onClick={handleReprocessAnalysis}
+                  disabled={isProcessing}
+                  className="flex items-center py-1 px-3 text-sm bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+                >
+                  {isProcessing ? (
+                    <>
+                      <span className="mr-2 inline-block w-3 h-3 border-2 border-t-transparent border-white rounded-full animate-spin"></span>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      Analyze Entry
+                    </>
+                  )}
+                </button>
+              ) : null}
+            </div>
+
+            {/* Processing error message */}
+            {processingError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-md">
+                <p className="text-sm text-red-700">{processingError}</p>
+              </div>
+            )}
+
+            {/* Show "processing" message if entry hasn't been processed */}
+            {!entry.analysis.processed && !isProcessing && !processingError && (
+              <div className="mb-4 p-4 bg-yellow-50 border border-yellow-100 rounded-md">
+                <p className="text-sm text-yellow-700">
+                  This entry hasn't been fully analyzed yet. Click "Analyze Entry" to process it.
+                </p>
+              </div>
+            )}
 
             {/* Supportive Response */}
             {entry.analysis.supportiveResponse && (
@@ -252,14 +244,16 @@ export default function JournalEntryDetail({
                 entry.analysis.identifiedPatterns.length > 0 && (
                   <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-100">
                     <h4 className="text-sm font-medium text-gray-900 mb-2">
-                      Thought Patterns
+                      Identified Patterns
                     </h4>
-                    <ul className="list-disc list-inside text-gray-700">
-                      {entry.analysis.identifiedPatterns.map((pattern, idx) => (
-                        <li key={idx} className="mb-1">
-                          {pattern}
-                        </li>
-                      ))}
+                    <ul className="list-disc pl-5 text-gray-700 text-sm">
+                      {entry.analysis.identifiedPatterns.map(
+                        (pattern, idx) => (
+                          <li key={idx} className="mb-1">
+                            {pattern}
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
                 )}
@@ -271,7 +265,7 @@ export default function JournalEntryDetail({
                     <h4 className="text-sm font-medium text-gray-900 mb-2">
                       Suggested Strategies
                     </h4>
-                    <ul className="list-disc list-inside text-gray-700">
+                    <ul className="list-disc pl-5 text-gray-700 text-sm">
                       {entry.analysis.suggestedStrategies.map(
                         (strategy, idx) => (
                           <li key={idx} className="mb-1">
