@@ -159,4 +159,108 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getUserProfile };
+const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { username, email, currentPassword, newPassword } = req.body;
+    
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+    
+    // Prepare update object
+    const updateData = {};
+    
+    // Update username if provided
+    if (username && username !== user.username) {
+      updateData.username = username;
+    }
+    
+    // Update email if provided and valid
+    if (email && email !== user.email) {
+      if (!validator.isEmail(email)) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid email"
+        });
+      }
+      
+      // Check if email is already in use
+      const emailExists = await User.findOne({ email: email.toLowerCase(), _id: { $ne: userId } });
+      if (emailExists) {
+        return res.status(409).json({
+          success: false,
+          message: "This email is already in use by another account"
+        });
+      }
+      
+      updateData.email = email.toLowerCase();
+    }
+    
+    // Handle password change if requested
+    if (newPassword) {
+      // Verify current password first
+      if (!currentPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Current password is required to set a new password"
+        });
+      }
+      
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({
+          success: false,
+          message: "Current password is incorrect"
+        });
+      }
+      
+      // Validate new password
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: "New password must be at least 6 characters"
+        });
+      }
+      
+      // Hash new password
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(newPassword, salt);
+    }
+    
+    // Only update if there are changes
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No changes to update"
+      });
+    }
+    
+    // Update the user
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true }
+    ).select('-password');
+    
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser
+    });
+    
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update profile"
+    });
+  }
+};
+
+export { registerUser, loginUser, getUserProfile, updateUserProfile };

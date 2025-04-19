@@ -18,8 +18,9 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: (redirect?: boolean) => void;
   error: string | null;
+  initialized: boolean;
 }
 
 
@@ -32,6 +33,7 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => {},
   logout: () => {},
   error: null,
+  initialized: false,
 });
 
 
@@ -45,6 +47,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState<boolean>(false);
   const router = useRouter();
   
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
@@ -53,18 +56,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const loadUserFromStorage = () => {
       try {
+        setIsLoading(true);
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
         
         if (storedToken && storedUser) {
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
+          axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
         }
       } catch (err) {
         console.error('Error loading auth state from storage:', err);
-        logout();
+        logout(false); // Don't redirect on initial load error
       } finally {
         setIsLoading(false);
+        setInitialized(true);
       }
     };
 
@@ -73,19 +79,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       loadUserFromStorage();
     } else {
       setIsLoading(false);
+      setInitialized(true);
     }
   }, []);
 
-  
-  useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-    }
-  }, [token]);
+  // Removed the separate useEffect for axios headers - now handled in loadUserFromStorage and login
 
-  
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     setError(null);
@@ -96,6 +95,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       setToken(newToken);
       setUser(userData);
+      
+      // Set axios default headers
+      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       
       // Store in localStorage for persistence
       localStorage.setItem('token', newToken);
@@ -136,17 +138,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  // Logout function
-  const logout = () => {
+  // Logout function with optional redirect parameter
+  const logout = (redirect = true) => {
     setToken(null);
     setUser(null);
     setError(null);
     
     // Remove from localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      delete axios.defaults.headers.common['Authorization'];
+    }
     
-    router.push('/auth/login');
+    if (redirect) {
+      router.push('/auth/login');
+    }
   };
 
   // Determine if the user is authenticated
@@ -158,6 +165,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     token,
     isAuthenticated,
     isLoading,
+    initialized,
     login,
     register,
     logout,
