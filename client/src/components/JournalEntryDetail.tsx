@@ -86,11 +86,11 @@ export default function JournalEntryDetail({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="flex justify-between items-center p-5 bg-gray-50 border-b border-gray-200">
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+      <div className="flex justify-between items-center p-5 bg-white border-b border-gray-100">
         <button
           onClick={onBack}
-          className="text-gray-600 hover:text-gray-900 flex items-center"
+          className="text-black hover:text-gray-700 flex items-center"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
@@ -101,13 +101,13 @@ export default function JournalEntryDetail({
         <div className="flex gap-2">
           <button
             onClick={handleEdit}
-            className="py-1 px-3 text-sm bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
+            className="py-1 px-3 text-sm bg-white text-black border border-gray-200 rounded hover:bg-gray-50"
           >
             Edit
           </button>
           <button
             onClick={() => onDelete(entry._id)}
-            className="py-1 px-3 text-sm bg-red-50 text-red-600 rounded hover:bg-red-100"
+            className="py-1 px-3 text-sm bg-white text-black border border-gray-200 rounded hover:bg-gray-50"
           >
             Delete
           </button>
@@ -117,7 +117,7 @@ export default function JournalEntryDetail({
       <div>
         <div className="p-5">
           <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-black">
               Journal Entry
             </h2>
             <span className="text-sm text-gray-500">{formattedDate}</span>
@@ -129,17 +129,17 @@ export default function JournalEntryDetail({
               <span
                 className={`inline-block rounded-full w-3 h-3 mr-2 ${
                   entry.mood.label === "Very Positive"
-                    ? "bg-emerald-500"
+                    ? "bg-black"
                     : entry.mood.label === "Positive"
-                    ? "bg-green-400"
+                    ? "bg-gray-700"
                     : entry.mood.label === "Neutral"
                     ? "bg-gray-400"
                     : entry.mood.label === "Negative"
-                    ? "bg-orange-400"
-                    : "bg-red-500"
+                    ? "bg-gray-600"
+                    : "bg-black"
                 }`}
               ></span>
-              <span className="text-gray">
+              <span className="text-black">
                 {entry.mood.label === "Very Positive" 
                   ? "😄 Very Positive" 
                   : entry.mood.label === "Positive" 
@@ -164,7 +164,7 @@ export default function JournalEntryDetail({
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-700"
+                  className="inline-block bg-white border border-gray-200 rounded-full px-3 py-1 text-sm text-gray-700"
                 >
                   {tag}
                 </span>
@@ -173,16 +173,16 @@ export default function JournalEntryDetail({
           )}
 
           {/* Journal content */}
-          <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
+          <div className="border border-gray-100 rounded-md p-4 bg-white">
             <p className="text-gray-700 whitespace-pre-wrap">{entry.content}</p>
           </div>
         </div>
 
         {/* AI Analysis */}
         {entry.analysis && (
-          <div className="p-5 bg-gray-50 border-t border-gray-200">
+          <div className="p-5 bg-white border-t border-gray-100">
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-black">
                 AI Insights
               </h3>
 
@@ -212,15 +212,15 @@ export default function JournalEntryDetail({
 
             {/* Processing error message */}
             {processingError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-md">
-                <p className="text-sm text-red-700">{processingError}</p>
+              <div className="mb-4 p-3 bg-white border border-gray-200 rounded-md">
+                <p className="text-sm text-gray-700">{processingError}</p>
               </div>
             )}
 
             {/* Show "processing" message if entry hasn't been processed */}
             {!entry.analysis.processed && !isProcessing && !processingError && (
-              <div className="mb-4 p-4 bg-yellow-50 border border-yellow-100 rounded-md">
-                <p className="text-sm text-yellow-700">
+              <div className="mb-4 p-4 bg-white border border-gray-200 rounded-md">
+                <p className="text-sm text-gray-700">
                   This entry hasn't been fully analyzed yet. Click "Analyze Entry" to process it.
                 </p>
               </div>
@@ -229,7 +229,7 @@ export default function JournalEntryDetail({
             {/* Supportive Response */}
             {entry.analysis.supportiveResponse && (
               <div className="mb-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <h4 className="text-sm font-medium text-gray-900 mb-2">
+                <h4 className="text-sm font-medium text-black mb-2">
                   Reflection
                 </h4>
                 <p className="text-gray-700">
@@ -243,7 +243,7 @@ export default function JournalEntryDetail({
               {entry.analysis.identifiedPatterns &&
                 entry.analysis.identifiedPatterns.length > 0 && (
                   <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">
+                    <h4 className="text-sm font-medium text-black mb-2">
                       Identified Patterns
                     </h4>
                     <ul className="list-disc pl-5 text-gray-700 text-sm">
@@ -262,7 +262,7 @@ export default function JournalEntryDetail({
               {entry.analysis.suggestedStrategies &&
                 entry.analysis.suggestedStrategies.length > 0 && (
                   <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">
+                    <h4 className="text-sm font-medium text-black mb-2">
                       Suggested Strategies
                     </h4>
                     <ul className="list-disc pl-5 text-gray-700 text-sm">

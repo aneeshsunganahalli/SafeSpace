@@ -116,7 +116,7 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
   };
 
   // Truncate content for preview
-  const truncate = (text: string, maxLength: number = 150) => {
+  const truncate = (text: string, maxLength: number = 250) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
   };
@@ -131,8 +131,8 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
 
   if (error) {
     return (
-      <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-        <p className="text-sm text-red-700">{error}</p>
+      <div className="bg-white border-l-4 border-black p-4 rounded-md">
+        <p className="text-sm text-black">{error}</p>
       </div>
     );
   }
@@ -140,7 +140,7 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
   if (entries.length === 0) {
     return (
       <div className="text-center py-10">
-        <p className="text-gray-600 mb-4">You haven't created any journal entries yet.</p>
+        <p className="text-gray-700 mb-4">You haven't created any journal entries yet.</p>
         <button
           onClick={() => window.location.href = "/journal?tab=new"}
           className="py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800"
@@ -164,38 +164,38 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Journal Entries</h2>
+      <h2 className="text-xl font-semibold text-black mb-6">Your Journal Entries</h2>
       
-      <div className="space-y-4">
+      <div className="space-y-5">
         {entries.map((entry) => (
           <div 
             key={entry._id} 
             onClick={() => setSelectedEntry(entry)}
-            className="bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow"
+            className="bg-white p-5 rounded-lg border border-gray-100 cursor-pointer hover:shadow-sm transition-shadow"
           >
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-sm text-gray-500">{formatDate(entry.date)}</div>
-                <div className="mt-1 font-medium">
+                <div className="text-sm text-black">{formatDate(entry.date)}</div>
+                <div className="mt-1 font-bold text-black">
                   {entry.mood.label} {getMoodEmoji(entry.mood.label)}
                 </div>
               </div>
               <div className="flex space-x-1">
                 {entry.tags.map((tag) => (
-                  <span key={tag} className="bg-gray-100 text-xs px-2 py-0.5 rounded">
+                  <span key={tag} className="bg-white border border-gray-200 text-xs px-2 py-0.5 rounded">
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
             
-            <div className="mt-2 text-gray-600">
+            <div className="mt-3 text-gray-600">
               {truncate(entry.content)}
             </div>
             
             {entry.analysis.processed && (
-              <div className="mt-2 flex items-center text-xs text-gray-500">
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mt-3 flex items-center text-xs text-gray-500">
+                <svg className="w-4 h-4 mr-1 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Analysis available
