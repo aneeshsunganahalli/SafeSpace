@@ -134,9 +134,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="text-sm">
+            <div className="text-sm text-black">
               Already have an account?{" "}
-              <Link href="/auth/login" className="font-medium text-black hover:text-gray-700">
+              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-gray-700">
                 Sign in
               </Link>
             </div>

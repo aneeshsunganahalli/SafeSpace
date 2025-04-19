@@ -197,7 +197,7 @@ export default function ProfilePage() {
   }
   
   return (
-    <main className="min-h-screen p-6 bg-gray-50 flex flex-col items-center">
+    <main className="min-h-screen p-6 bg-gray-50 flex flex-col items-center pt-30">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-sm">
         <h1 className="text-2xl font-bold text-black mb-6">User Profile</h1>
         

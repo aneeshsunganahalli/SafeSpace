@@ -72,7 +72,7 @@ export default function JournalPage() {
   }
 
   return (
-    <div className="w-full bg-white min-h-screen">
+    <div className="w-full bg-white min-h-screen pt-20">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-black">My Journal</h1>

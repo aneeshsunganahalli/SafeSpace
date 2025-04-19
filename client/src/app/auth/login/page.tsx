@@ -100,9 +100,9 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="text-sm">
+            <div className="text-sm text-black">
               Don't have an account?{" "}
-              <Link href="/auth/register" className="font-medium text-black hover:text-gray-700">
+              <Link href="/auth/register" className="font-medium text-blue-600 hover:text-gray-700">
                 Sign up
               </Link>
             </div>
