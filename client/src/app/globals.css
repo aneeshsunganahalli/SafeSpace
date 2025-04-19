@@ -1,8 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #3C3C3C;
+  --primary-bg: #F2F4F8;
+  --accent-blue: #C1DFF0;
+  --accent-pink: #FBE4E7;
+  --accent-mint: #CFE3DC;
+  --text-color: #3C3C3C;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --primary-color: #C1DFF0;
+  --secondary-color: #CFE3DC;
+  --accent-color: #FBE4E7;
+  --background-color: #F2F4F8;
 }
 
 @theme inline {
@@ -19,8 +31,129 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--primary-bg);
+  color: var(--text-color);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: 'DM Serif Display', serif;
+  line-height: 1.3;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+  @apply rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg;
+}
+
+.card:hover {
+  box-shadow: var(--hover-shadow);
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-mint) 100%);
+  background: linear-gradient(to right, #C1DFF0, #CFE3DC);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-blue);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-color);
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Form elements */
+input, textarea, select {
+  transition: all 0.2s ease;
+  @apply rounded-md border border-gray-300 px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#C1DFF0] focus:border-transparent transition-all;
+}
+
+button {
+  transition: all 0.2s ease;
+  @apply transition-all duration-200;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  @apply bg-[#C1DFF0] hover:bg-[#C1DFF0]/80 text-[#3C3C3C] py-2 px-4 rounded-md shadow-sm hover:shadow font-medium;
+}
+
+.btn-secondary {
+  @apply bg-[#CFE3DC] hover:bg-[#CFE3DC]/80 text-[#3C3C3C] py-2 px-4 rounded-md shadow-sm hover:shadow font-medium;
+}
+
+.btn-accent {
+  @apply bg-[#FBE4E7] hover:bg-[#FBE4E7]/80 text-[#3C3C3C] py-2 px-4 rounded-md shadow-sm hover:shadow font-medium;
+}
+
+.btn-dark {
+  @apply bg-[#3C3C3C] hover:bg-[#3C3C3C]/80 text-white py-2 px-4 rounded-md shadow-sm hover:shadow font-medium;
+}
+
+/* Custom background patterns */
+.pattern-dots {
+  background-color: #F2F4F8;
+  background-image: radial-gradient(var(--primary-color) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.pattern-lines {
+  background-color: #F2F4F8;
+  background-image: linear-gradient(var(--primary-color) 1px, transparent 1px);
+  background-size: 100% 20px;
 }

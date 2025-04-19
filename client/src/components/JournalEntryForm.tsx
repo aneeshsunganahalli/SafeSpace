@@ -117,128 +117,133 @@ export default function JournalEntryForm({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-      <h2 className="text-xl font-semibold text-black mb-4">
-        {existingEntry ? "Edit Journal Entry" : "Create New Journal Entry"}
-      </h2>
-      
-      {error && (
-        <div className="bg-white border-l-4 border-black p-4 mb-6 rounded-md">
-          <p className="text-sm text-black">{error}</p>
-        </div>
-      )}
-      
-      {success && (
-        <div className="bg-white border-l-4 border-black p-4 mb-6 rounded-md">
-          <p className="text-sm text-black">{success}</p>
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit}>
+    <div className="mb-4">
+      <div className="bg-white p-6 rounded-xl shadow-md border border-[#C1DFF0]">
+        <h2 className="text-xl font-semibold mb-4 text-[#3C3C3C]">{existingEntry ? "Edit Journal Entry" : "New Journal Entry"}</h2>
+
         {/* Mood Selection */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-black mb-2">
-            How are you feeling today?
-          </label>
+        <div className="mb-5">
+          <label className="block text-[#3C3C3C] text-sm font-medium mb-2">How are you feeling today?</label>
           <div className="flex flex-wrap gap-2">
             {moodOptions.map((mood) => (
               <button
                 type="button"
                 key={mood.value}
                 onClick={() => setSelectedMood(mood.value)}
-                className={`py-2 px-4 rounded-full text-sm font-medium ${
-                  selectedMood === mood.value
-                    ? "bg-black text-white"
-                    : "bg-white text-black border border-gray-200 hover:bg-gray-50"
-                }`}
+                className={`py-2 px-4 rounded-full text-xs font-medium 
+                  ${selectedMood === mood.value 
+                    ? "bg-[#3C3C3C] text-white" 
+                    : "bg-white text-[#3C3C3C] border border-[#C1DFF0]"
+                  }`}
               >
                 {mood.label}
               </button>
             ))}
           </div>
         </div>
-        
+
         {/* Journal Content */}
-        <div className="mb-6">
-          <label
-            htmlFor="content"
-            className="block text-sm font-medium text-black mb-2"
-          >
-            Write your thoughts
+        <div className="mb-5">
+          <label htmlFor="content" className="block text-[#3C3C3C] text-sm font-medium mb-2">
+            Journal Entry
           </label>
           <textarea
             id="content"
-            rows={8}
+            name="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="How was your day? What's on your mind? How are you feeling?"
-            className="block w-full rounded-md border-gray-200 shadow-sm focus:border-black focus:ring-black text-sm p-4 text-black"
-          />
+            rows={6}
+            className="w-full p-2.5 text-sm bg-[#F2F4F8] border border-[#CFE3DC] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C1DFF0] focus:border-transparent text-[#3C3C3C]"
+            placeholder="Share your thoughts and feelings..."
+          ></textarea>
         </div>
-        
-        {/* Tags */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-black mb-2">
-            Tags (optional)
+
+        {/* Tags Input */}
+        <div className="mb-5">
+          <label htmlFor="tags" className="block text-[#3C3C3C] text-sm font-medium mb-2">
+            Tags <span className="text-xs text-gray-500">(optional)</span>
           </label>
+          
+          {/* Display selected tags */}
           <div className="flex flex-wrap gap-2 mb-2">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="bg-white border border-gray-200 text-black text-xs font-medium px-2.5 py-1 rounded-full flex items-center"
-              >
-                {tag}
+            {tags.map((tag, index) => (
+              <div key={index} className="bg-[#F2F4F8] border border-[#CFE3DC] text-xs px-2.5 py-1 rounded-full flex items-center">
+                <span className="text-[#3C3C3C]">{tag}</span>
                 <button
                   type="button"
                   onClick={() => handleTagRemove(tag)}
-                  className="ml-1.5 text-gray-500 hover:text-black"
-                  aria-label={`Remove tag ${tag}`}
+                  className="ml-1.5 text-gray-500 hover:text-gray-700"
                 >
-                  ×
+                  &times;
                 </button>
-              </span>
+              </div>
             ))}
           </div>
+
           <div className="flex">
             <input
+              id="tagInput"
               type="text"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Add tags (e.g., work, family)"
-              className="block w-full rounded-l-md border-gray-200 shadow-sm focus:border-black focus:ring-black text-sm p-2.5 text-black"
+              className="flex-grow p-2 text-sm bg-[#F2F4F8] border border-[#CFE3DC] rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#C1DFF0] focus:border-transparent text-[#3C3C3C]"
+              placeholder="Add a tag and press Enter (e.g., work, anxiety, gratitude)"
             />
             <button
               type="button"
               onClick={handleTagAdd}
-              className="bg-black text-white px-4 rounded-r-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black"
+              className="p-2 bg-[#3C3C3C] text-white rounded-r-md"
             >
               Add
             </button>
           </div>
         </div>
-        
-        {/* Submit Button */}
-        <div>
+
+        {/* Submit & Cancel Buttons */}
+        <div className="flex gap-3">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50"
+            className="py-2 px-4 flex-1 bg-[#3C3C3C] text-white rounded-md hover:bg-[#3C3C3C]/90 transition-colors shadow-sm"
           >
-            {isSubmitting
-              ? "Saving..."
-              : existingEntry
-              ? "Update Entry"
-              : "Save Entry"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+              </span>
+            ) : (
+              existingEntry ? "Update Entry" : "Save Entry"
+            )}
+          </button>
+          <button
+            type="button"
+            className="py-2 px-4 border border-[#3C3C3C] text-[#3C3C3C] rounded-md hover:bg-gray-50 transition-colors"
+          >
+            Cancel
           </button>
         </div>
-      </form>
-      
-      <div className="mt-4 text-xs text-gray-600">
-        <p>
-          Your journal entries will be analyzed to provide personalized insights
-          and coping strategies. All data is kept private and secure.
-        </p>
+
+        {error && (
+          <div className="mt-4 p-3 bg-[#FBE4E7]/30 text-[#3C3C3C] rounded-md">
+            {error}
+          </div>
+        )}
+      </div>
+
+      {/* Journal Guidelines */}
+      <div className="mt-6 bg-white p-5 rounded-lg border border-[#CFE3DC] text-[#3C3C3C]">
+        <h3 className="text-lg font-medium mb-2">Journaling Tips</h3>
+        <ul className="list-disc pl-5 space-y-2 text-sm">
+          <li>Be honest with yourself - this is your safe space.</li>
+          <li>Try to write regularly, even if it's just a few sentences.</li>
+          <li>Focus on both challenges and positive moments in your day.</li>
+          <li>Include any coping strategies that helped you today.</li>
+          <li>Your entries will be analyzed to provide personalized insights.</li>
+        </ul>
       </div>
     </div>
   );

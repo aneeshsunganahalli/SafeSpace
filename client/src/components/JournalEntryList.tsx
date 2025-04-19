@@ -116,7 +116,7 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
   };
 
   // Truncate content for preview
-  const truncate = (text: string, maxLength: number = 250) => {
+  const truncate = (text: string, maxLength: number = 150) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
   };
@@ -124,27 +124,41 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-black"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#C1DFF0] border-t-transparent"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white border-l-4 border-black p-4 rounded-md">
-        <p className="text-sm text-black">{error}</p>
+      <div className="card p-6 border-l-4 border-[#FBE4E7] fade-in">
+        <p className="text-sm text-[#3C3C3C] flex items-center">
+          <svg className="w-5 h-5 mr-2 text-[#FBE4E7]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          {error}
+        </p>
       </div>
     );
   }
 
   if (entries.length === 0) {
     return (
-      <div className="text-center py-10">
-        <p className="text-gray-700 mb-4">You haven't created any journal entries yet.</p>
+      <div className="card text-center py-12 px-8 fade-in max-w-lg mx-auto">
+        <div className="bg-[#C1DFF0]/30 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+          <svg className="w-10 h-10 text-[#3C3C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-medium text-[#3C3C3C] mb-4">Your Journal Journey Starts Here</h3>
+        <p className="text-[#3C3C3C] mb-6 max-w-sm mx-auto">Capture your thoughts, track your emotions, and gain valuable insights about your mental wellbeing.</p>
         <button
           onClick={() => window.location.href = "/journal?tab=new"}
-          className="py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800"
+          className="py-3 px-8 bg-[#3C3C3C] text-white rounded-full hover:bg-[#3C3C3C]/90 transition-all transform hover:scale-105 shadow-md flex items-center mx-auto"
         >
+          <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
           Create Your First Entry
         </button>
       </div>
@@ -163,42 +177,68 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold text-black mb-6">Your Journal Entries</h2>
+    <div className="fade-in">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-semibold text-[#3C3C3C] flex items-center">
+          <svg className="w-6 h-6 mr-2 text-[#C1DFF0]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          Your Journal Entries
+        </h2>
+      </div>
       
-      <div className="space-y-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {entries.map((entry) => (
           <div 
             key={entry._id} 
             onClick={() => setSelectedEntry(entry)}
-            className="bg-white p-5 rounded-lg border border-gray-100 cursor-pointer hover:shadow-sm transition-shadow"
+            className="card p-5 cursor-pointer transition-all duration-300 hover:translate-y-[-4px] flex flex-col h-full border border-white hover:border-[#C1DFF0]"
           >
-            <div className="flex justify-between items-start">
-              <div>
-                <div className="text-sm text-black">{formatDate(entry.date)}</div>
-                <div className="mt-1 font-bold text-black">
-                  {entry.mood.label} {getMoodEmoji(entry.mood.label)}
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex flex-col">
+                <div className="text-sm text-gray-500 font-medium">{formatDate(entry.date)}</div>
+                <div className="mt-1 font-bold text-[#3C3C3C] text-lg flex items-center">
+                  <span className="text-2xl mr-2">{getMoodEmoji(entry.mood.label)}</span> 
+                  <span>{entry.mood.label}</span>
                 </div>
               </div>
-              <div className="flex space-x-1">
-                {entry.tags.map((tag) => (
-                  <span key={tag} className="bg-white border border-gray-200 text-xs px-2 py-0.5 rounded">
-                    {tag}
-                  </span>
-                ))}
+              <div className={`h-10 w-10 rounded-full flex items-center justify-center shadow-md ${
+                entry.mood.label === "Very Positive" ? "bg-gradient-to-br from-[#C1DFF0] to-[#C1DFF0]/70" : 
+                entry.mood.label === "Positive" ? "bg-gradient-to-br from-[#C1DFF0]/80 to-[#C1DFF0]/50" :
+                entry.mood.label === "Neutral" ? "bg-gradient-to-br from-[#CFE3DC] to-[#CFE3DC]/70" :
+                entry.mood.label === "Negative" ? "bg-gradient-to-br from-[#FBE4E7]/80 to-[#FBE4E7]/50" : 
+                "bg-gradient-to-br from-[#FBE4E7] to-[#FBE4E7]/70"
+              }`}>
+                <span className="text-2xl">{getMoodEmoji(entry.mood.label)}</span>
               </div>
             </div>
             
-            <div className="mt-3 text-gray-600">
-              {truncate(entry.content)}
+            <div className="mt-2 flex-grow bg-[#F2F4F8]/50 p-4 rounded-lg border-l-4 border-[#C1DFF0] relative overflow-hidden">
+              <p className="text-[#3C3C3C] leading-relaxed">
+                {truncate(entry.content, 120)}
+              </p>
+              <div className="absolute bottom-0 right-0 left-0 h-8 bg-gradient-to-t from-[#F2F4F8]/90 to-transparent"></div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-1.5 justify-start">
+              {entry.tags.slice(0, 3).map((tag) => (
+                <span key={tag} className="bg-[#F2F4F8] border border-[#CFE3DC] text-xs px-2.5 py-1 rounded-full font-medium text-[#3C3C3C] transition-colors hover:bg-[#CFE3DC]/30">
+                  {tag}
+                </span>
+              ))}
+              {entry.tags.length > 3 && (
+                <span className="bg-[#F2F4F8] border border-[#CFE3DC] text-xs px-2.5 py-1 rounded-full font-medium text-[#3C3C3C]">
+                  +{entry.tags.length - 3} more
+                </span>
+              )}
             </div>
             
             {entry.analysis.processed && (
-              <div className="mt-3 flex items-center text-xs text-gray-500">
-                <svg className="w-4 h-4 mr-1 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mt-4 flex items-center justify-center text-xs bg-[#CFE3DC]/30 text-[#3C3C3C] py-2.5 px-3 rounded-md hover:bg-[#CFE3DC]/50 transition-colors">
+                <svg className="w-4 h-4 mr-1.5 text-[#3C3C3C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                Analysis available
+                <span className="font-medium">View insights</span>
               </div>
             )}
           </div>
