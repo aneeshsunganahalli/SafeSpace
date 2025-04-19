@@ -1,8 +1,6 @@
-import axios from 'axios';
 import JournalEntry from '../models/journalEntryModel.js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Get all journal entries for a user
 const getJournalEntries = async (req, res) => {
   try {
     const entries = await JournalEntry.find({ userId: req.user.id })
@@ -15,7 +13,7 @@ const getJournalEntries = async (req, res) => {
   }
 };
 
-// Get a single journal entry
+
 const getJournalEntry = async (req, res) => {
   try {
     const entry = await JournalEntry.findOne({
@@ -34,7 +32,7 @@ const getJournalEntry = async (req, res) => {
   }
 };
 
-// Create a new journal entry
+
 const createJournalEntry = async (req, res) => {
   try {
     const { content, mood, tags } = req.body;
@@ -59,7 +57,7 @@ const createJournalEntry = async (req, res) => {
   }
 };
 
-// Update a journal entry
+
 const updateJournalEntry = async (req, res) => {
   try {
     const { content, mood, tags } = req.body;
@@ -86,7 +84,7 @@ const updateJournalEntry = async (req, res) => {
   }
 };
 
-// Delete a journal entry
+
 const deleteJournalEntry = async (req, res) => {
   try {
     const entry = await JournalEntry.findOneAndDelete({
@@ -105,7 +103,7 @@ const deleteJournalEntry = async (req, res) => {
   }
 };
 
-// Get journal insights
+
 const getJournalInsights = async (req, res) => {
   try {
     // Get entries to work with
@@ -120,15 +118,6 @@ const getJournalInsights = async (req, res) => {
         unprocessedCount: 0
       });
     }
-    
-    // Map mood scores to labels if labels are missing
-    const moodMap = {
-      '1-2': 'Very Negative',
-      '3-4': 'Negative', 
-      '5-6': 'Neutral',
-      '7-8': 'Positive',
-      '9-10': 'Very Positive'
-    };
     
     // Calculate mood distribution manually if necessary
     let moodDistribution = await JournalEntry.aggregate([
