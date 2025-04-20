@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import JournalEntryDetail from "./JournalEntryDetail";
 
 interface JournalEntry {
@@ -67,10 +67,6 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
   };
 
   const handleDeleteEntry = async (entryId: string) => {
-    if (!window.confirm("Are you sure you want to delete this journal entry?")) {
-      return;
-    }
-
     try {
       const config = {
         headers: {
@@ -89,7 +85,7 @@ export default function JournalEntryList({ shouldRefresh = false }: JournalEntry
       }
     } catch (err) {
       console.error("Error deleting journal entry:", err);
-      alert("Failed to delete journal entry");
+      // Error will be handled in the UI
     }
   };
 

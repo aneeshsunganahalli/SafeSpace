@@ -14,6 +14,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // Streak tracking fields
+  currentStreak: {
+    type: Number,
+    default: 0
+  },
+  longestStreak: {
+    type: Number,
+    default: 0
+  },
+  lastEntryDate: {
+    type: Date,
+    default: null
+  }
 }, {timestamps: true});
 
 const User = mongoose.model("User", userSchema);

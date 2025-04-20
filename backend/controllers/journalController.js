@@ -1,4 +1,5 @@
 import JournalEntry from '../models/journalEntryModel.js';
+import User from '../models/userModel.js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 
@@ -51,7 +52,62 @@ const createJournalEntry = async (req, res) => {
       console.error('Error processing entry with LLM:', err)
     );
     
-    res.status(201).json(entry);
+    // Update user's streak
+    try {
+      // Get the current user with streak data
+      const user = await User.findById(req.user.id);
+      
+      if (user) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set to beginning of day for accurate comparison
+        
+        let newStreak = 1; // Default to 1 for first entry or reset streak
+        
+        if (user.lastEntryDate) {
+          const lastEntryDate = new Date(user.lastEntryDate);
+          lastEntryDate.setHours(0, 0, 0, 0);
+          
+          // Calculate days between entries
+          const timeDiff = today.getTime() - lastEntryDate.getTime();
+          const daysDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+          
+          if (daysDiff === 1) {
+            // Consecutive day, increment streak
+            newStreak = user.currentStreak + 1;
+          } else if (daysDiff === 0) {
+            // Same day, maintain current streak
+            newStreak = user.currentStreak;
+          }
+          // Otherwise it's been more than one day, reset to 1 (default)
+        }
+        
+        // Update streak information
+        user.currentStreak = newStreak;
+        user.lastEntryDate = today;
+        
+        // Update longest streak if needed
+        if (newStreak > user.longestStreak) {
+          user.longestStreak = newStreak;
+        }
+        
+        await user.save();
+      }
+    } catch (streakError) {
+      // Log streak error but don't fail the entire request
+      console.error('Error updating streak:', streakError);
+    }
+    
+    // Include streak in the response
+    const userWithUpdatedStreak = await User.findById(req.user.id).select('currentStreak longestStreak');
+    const responseData = {
+      entry,
+      streak: {
+        current: userWithUpdatedStreak?.currentStreak || 0,
+        longest: userWithUpdatedStreak?.longestStreak || 0
+      }
+    };
+    
+    res.status(201).json(responseData);
   } catch (error) {
     console.error('Error creating journal entry:', error);
     res.status(500).json({ message: 'Failed to create journal entry' });

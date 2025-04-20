@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
-import JournalEntryForm from "../../components/JournalEntryForm";
-import JournalEntryList from "../../components/JournalEntryList";
-import JournalInsights from "../../components/JournalInsights";
+import JournalEntryForm from "../../components/Journal/JournalEntryForm";
+import JournalEntryList from "../../components/Journal/JournalEntryList";
+import JournalInsights from "../../components/Journal/JournalInsights";
 
 interface JournalEntry {
   _id: string;

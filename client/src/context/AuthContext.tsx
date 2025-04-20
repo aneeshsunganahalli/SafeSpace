@@ -9,6 +9,8 @@ interface User {
   _id: string;
   username: string;
   email: string;
+  currentStreak?: number;
+  longestStreak?: number;
 }
 
 interface AuthContextType {
@@ -19,6 +21,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: (redirect?: boolean) => void;
+  updateUserStreak: (streakData: {current: number, longest: number}) => void;
   error: string | null;
   initialized: boolean;
 }
@@ -32,6 +35,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   register: async () => {},
   logout: () => {},
+  updateUserStreak: () => {},
   error: null,
   initialized: false,
 });
@@ -156,6 +160,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  // Update user streak function
+  const updateUserStreak = (streakData: {current: number, longest: number}) => {
+    if (user) {
+      const updatedUser = { ...user, currentStreak: streakData.current, longestStreak: streakData.longest };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  };
+
   // Determine if the user is authenticated
   const isAuthenticated = !!user && !!token;
 
@@ -169,6 +182,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     register,
     logout,
+    updateUserStreak,
     error,
   };
 

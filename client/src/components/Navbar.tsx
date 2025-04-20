@@ -94,6 +94,21 @@ export default function Navbar() {
                 >
                   Profile
                 </Link>
+
+                {/* Streak Display */}
+                {user?.currentStreak !== undefined && user.currentStreak > 0 && (
+                  <div 
+                    className="ml-3 flex items-center rounded-full bg-gradient-to-r from-amber-200 to-yellow-300 px-3 py-1.5 shadow-sm"
+                    title={`Longest streak: ${user.longestStreak || user.currentStreak} days`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11.1c.5 2 .5 3.5-1.185 5.4" />
+                    </svg>
+                    <span className="text-xs font-bold text-amber-800">{user.currentStreak} day{user.currentStreak !== 1 ? 's' : ''}</span>
+                  </div>
+                )}
+                
                 <div className="ml-3 pl-3 border-l border-gray-200">
                   <div className="flex items-center">
                     <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 text-sm font-medium text-gray-800 mr-2">
@@ -207,6 +222,15 @@ export default function Navbar() {
                       </div>
                       <div className="ml-3">
                         <div className="text-base font-medium text-gray-800">{user?.username}</div>
+                        {user?.currentStreak !== undefined && user.currentStreak > 0 && (
+                          <div className="text-sm text-gray-500 flex items-center mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11.1c.5 2 .5 3.5-1.185 5.4" />
+                            </svg>
+                            {user.currentStreak} day streak
+                          </div>
+                        )}
                       </div>
                     </div>
                     <button 

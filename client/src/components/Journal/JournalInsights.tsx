@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import {
   Chart as ChartJS,
@@ -15,7 +15,7 @@ import {
   BarElement
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
-import WordCloudDisplay from './WordCloudDisplay'; // Import the WordCloudDisplay component
+import WordCloudDisplay from '../WordCloudDisplay'; // Import the WordCloudDisplay component
 
 // Register Chart.js components
 ChartJS.register(

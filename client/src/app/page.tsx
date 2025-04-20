@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import JournalPreview from "../components/JournalPreview";
+import JournalPreview from "../components/Journal/JournalPreview";
 
 export default function Home() {
   return (
