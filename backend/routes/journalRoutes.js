@@ -1,5 +1,5 @@
 import express from 'express';
-import  verifyToken  from '../middlewares/verifyToken.js';
+import verifyToken from '../middlewares/verifyToken.js';
 import {
   getJournalEntries,
   createJournalEntry,
@@ -8,8 +8,9 @@ import {
   updateJournalEntry,
   deleteJournalEntry,
   reprocessJournalEntries,
-  reprocessSingleEntry
+  reprocessSingleEntry,
 } from '../controllers/journalController.js';
+import { getWordCloudData } from '../controllers/moodController.js';
 
 const router = express.Router();
 
@@ -21,6 +22,7 @@ router.get('/', getJournalEntries);
 router.post('/', createJournalEntry);
 router.get('/insights', getJournalInsights);
 router.post('/reprocess', reprocessJournalEntries);
+router.get('/wordcloud', getWordCloudData); // Moved specific route before general :id route
 router.get('/:id', getJournalEntry);
 router.put('/:id', updateJournalEntry);
 router.delete('/:id', deleteJournalEntry);
