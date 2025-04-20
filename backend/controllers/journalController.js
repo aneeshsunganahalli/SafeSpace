@@ -1,6 +1,6 @@
 import JournalEntry from '../models/journalEntryModel.js';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { removeStopwords, eng } from 'stopword'; // Import stopword library
+
 
 const getJournalEntries = async (req, res) => {
   try {
