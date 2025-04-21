@@ -30,6 +30,7 @@ export default function WordCloudDisplay() {
   const [error, setError] = useState('');
   const [timeframe, setTimeframe] = useState<'week' | 'twoWeeks'>('week');
   const { token } = useAuth();
+  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
 
   const fetchWordCloudData = useCallback(async () => {
     if (!token) return;
@@ -38,7 +39,7 @@ export default function WordCloudDisplay() {
     setLayoutWords([]);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/journal/wordcloud`,
+        `${backendUrl}/api/journal/wordcloud`,
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { timeframe: timeframe },

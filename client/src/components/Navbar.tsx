@@ -120,7 +120,7 @@ export default function Navbar() {
                         e.preventDefault();
                         logout();
                       }}
-                      className="text-red-600 text-sm font-medium"
+                      className="text-red-600 text-sm font-medium cursor-pointer"
                     >
                       Sign Out
                     </button>

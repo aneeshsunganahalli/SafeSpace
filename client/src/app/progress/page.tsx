@@ -42,7 +42,7 @@ export default function ProgressPage() {
   };
 
   return (
-    <main className="container mx-auto px-4 max-w-5xl py-2">
+    <main className="container mx-auto px-4 max-w-5xl py-25">
       <h1 className="text-3xl text-black font-bold mb-8">Your Progress</h1>
 
       {/* Streak Card */}

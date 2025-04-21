@@ -138,6 +138,18 @@ export default function JournalEntryForm({
 
   return (
     <div className="mb-4">
+      {/* Journal Guidelines */}
+      <div className="mb-6 bg-white p-5 rounded-lg border border-[#CFE3DC] text-[#3C3C3C]">
+        <h3 className="text-lg font-medium mb-2">Journaling Tips</h3>
+        <ul className="list-disc pl-5 space-y-2 text-sm">
+          <li>Be honest with yourself - this is your safe space.</li>
+          <li>Try to write regularly, even if it's just a few sentences.</li>
+          <li>Focus on both challenges and positive moments in your day.</li>
+          <li>Include any coping strategies that helped you today.</li>
+          <li>Your entries will be analyzed to provide personalized insights.</li>
+        </ul>
+      </div>
+
       <div className="bg-white p-6 rounded-xl shadow-md border border-[#C1DFF0]">
         <h2 className="text-xl font-semibold mb-4 text-[#3C3C3C]">{existingEntry ? "Edit Journal Entry" : "New Journal Entry"}</h2>
 
@@ -254,18 +266,6 @@ export default function JournalEntryForm({
             </div>
           )}
         </form>
-      </div>
-
-      {/* Journal Guidelines */}
-      <div className="mt-6 bg-white p-5 rounded-lg border border-[#CFE3DC] text-[#3C3C3C]">
-        <h3 className="text-lg font-medium mb-2">Journaling Tips</h3>
-        <ul className="list-disc pl-5 space-y-2 text-sm">
-          <li>Be honest with yourself - this is your safe space.</li>
-          <li>Try to write regularly, even if it's just a few sentences.</li>
-          <li>Focus on both challenges and positive moments in your day.</li>
-          <li>Include any coping strategies that helped you today.</li>
-          <li>Your entries will be analyzed to provide personalized insights.</li>
-        </ul>
       </div>
 
       {/* Streak Milestone Celebration */}

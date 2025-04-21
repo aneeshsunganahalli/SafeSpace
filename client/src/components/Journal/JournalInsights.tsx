@@ -29,6 +29,12 @@ ChartJS.register(
   Legend
 );
 
+interface Quote {
+  q: string;
+  a: string;
+  h: string;
+}
+
 interface MoodTrendPoint {
   date: string;
   mood: {
@@ -53,15 +59,55 @@ export default function JournalInsights() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [timeframe, setTimeframe] = useState<'week' | 'month'>('week');
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(true);
   const { token } = useAuth();
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
+  // Fetch zen quotes from our backend proxy - only once when component mounts
+  useEffect(() => {
+    const fetchQuote = async () => {
+      try {
+        setQuoteLoading(true);
+        // Use sessionStorage to store the quote and prevent re-fetching
+        const cachedQuote = sessionStorage.getItem('inspirationalQuote');
+        const cachedTimestamp = sessionStorage.getItem('quoteTimestamp');
+        const currentTime = new Date().getTime();
+        
+        // If we have a cached quote that's less than 1 hour old, use it
+        if (cachedQuote && cachedTimestamp && 
+            (currentTime - parseInt(cachedTimestamp)) < 3600000) {
+          setQuote(JSON.parse(cachedQuote));
+          setQuoteLoading(false);
+          return;
+        }
+        
+        // Otherwise fetch a new quote
+        const response = await axios.get(`${backendUrl}/api/quotes/random`);
+        if (response.data && response.data.length > 0) {
+          const newQuote = response.data[0];
+          setQuote(newQuote);
+          // Cache the quote with timestamp
+          sessionStorage.setItem('inspirationalQuote', JSON.stringify(newQuote));
+          sessionStorage.setItem('quoteTimestamp', currentTime.toString());
+        }
+      } catch (err) {
+        console.error('Error fetching quote:', err);
+      } finally {
+        setQuoteLoading(false);
+      }
+    };
+    
+    fetchQuote();
+    // Empty dependency array ensures this effect only runs once when component mounts
+  }, []);
 
   useEffect(() => {
     const fetchInsights = async () => {
       try {
         setLoading(true);
         setError('');
-        
+
         const response = await axios.get(
           `${backendUrl}/api/journal/insights`,
           {
@@ -70,7 +116,7 @@ export default function JournalInsights() {
             }
           }
         );
-        
+
         setInsightsData(response.data);
       } catch (err) {
         console.error('Error fetching journal insights:', err);
@@ -188,8 +234,8 @@ export default function JournalInsights() {
 
     // Ensure we have data for all mood categories, even if count is 0
     const completeMoodData = moodOrder.map(mood => {
-        const existingData = sortedMoodData.find(item => item._id === mood);
-        return { _id: mood, count: existingData ? existingData.count : 0 };
+      const existingData = sortedMoodData.find(item => item._id === mood);
+      return { _id: mood, count: existingData ? existingData.count : 0 };
     });
 
 
@@ -238,7 +284,7 @@ export default function JournalInsights() {
       },
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function (context: any) {
             const moodScore = context.raw;
             let moodLabel = '';
 
@@ -275,9 +321,43 @@ export default function JournalInsights() {
     );
   }
 
+  // Generate a pastel color for the quote background
+  const pastelColors = [
+    'bg-gradient-to-r from-pink-100 to-pink-200',
+    'bg-gradient-to-r from-blue-100 to-blue-200',
+    'bg-gradient-to-r from-purple-100 to-purple-200',
+    'bg-gradient-to-r from-green-100 to-green-200',
+    'bg-gradient-to-r from-yellow-100 to-yellow-200',
+  ];
+
+  const randomPastelColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm">
-      <div className="p-6">
+    <div className="w-full bg-white">
+      {/* Daily Inspiration Quote */}
+      {!quoteLoading && quote && (
+        <div className={`${randomPastelColor} p-6 rounded-lg shadow-sm mb-8 transition-all hover:shadow-md`}>
+          <div className="flex flex-col items-center text-center">
+            <svg className="w-8 h-8 mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+            </svg>
+            <blockquote className="text-lg font-medium italic text-gray-700 mb-2">"{quote.q}"</blockquote>
+            <cite className="text-sm text-gray-500">— {quote.a}</cite>
+          </div>
+        </div>
+      )}
+
+      {quoteLoading && (
+        <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-8 animate-pulse">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-8 h-8 bg-gray-200 rounded-full mb-3"></div>
+            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+      )}
+      <div className="p-6 shadow-sm bg-white rounded-lg">
+
         <h2 className="text-2xl font-bold text-black mb-6">Your Mood Insights</h2>
 
         {/* Grid layout for charts */}
@@ -290,23 +370,21 @@ export default function JournalInsights() {
               </h3>
               {/* Timeframe toggle for mood trends */}
               <div className="flex space-x-2">
-                <button 
+                <button
                   onClick={() => setTimeframe('week')}
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    timeframe === 'week' 
-                      ? 'bg-black text-white' 
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${timeframe === 'week'
+                      ? 'bg-black text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   Week
                 </button>
-                <button 
+                <button
                   onClick={() => setTimeframe('month')}
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    timeframe === 'month' 
-                      ? 'bg-black text-white' 
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${timeframe === 'month'
+                      ? 'bg-black text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   Month
                 </button>
@@ -314,9 +392,9 @@ export default function JournalInsights() {
             </div>
             <div className="h-64">
               {insightsData?.moodTrend && insightsData.moodTrend.length > 0 ? (
-                <Line 
-                  data={timeframe === 'week' ? prepareWeeklyMoodTrendData() : prepareMonthlyMoodTrendData()} 
-                  options={chartOptions} 
+                <Line
+                  data={timeframe === 'week' ? prepareWeeklyMoodTrendData() : prepareMonthlyMoodTrendData()}
+                  options={chartOptions}
                 />
               ) : (
                 <div className="flex justify-center items-center h-full">
@@ -357,11 +435,11 @@ export default function JournalInsights() {
                       },
                       tooltip: { // Enhance tooltip
                         callbacks: {
-                          title: function(context) {
+                          title: function (context) {
                             // Use the label (Mood Category) as the title
                             return context[0].label;
                           },
-                          label: function(context) {
+                          label: function (context) {
                             // Show the count
                             let label = context.dataset.label || '';
                             if (label) {
