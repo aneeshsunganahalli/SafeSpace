@@ -16,8 +16,7 @@ import {
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import WordCloudDisplay from '../WordCloudDisplay'; // Import the WordCloudDisplay component
-import GratitudeForm from '../Gratitude/GratitudeForm';
-import GratitudeHistory from '../Gratitude/GratitudeHistory';
+import Link from 'next/link';
 
 // Register Chart.js components
 ChartJS.register(
@@ -359,11 +358,34 @@ export default function JournalInsights() {
         </div>
       )}
       
-      {/* Daily Gratitude Form */}
-      <GratitudeForm />
+      {/* Gratitude link card */}
+      <div className="bg-white p-6 rounded-xl shadow-sm mb-8 border border-[#C1DFF0] relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-[#C1DFF0]/10 blur-xl"></div>
+        <div className="flex justify-between items-center relative z-10">
+          <div className="flex items-center">
+            <div className="p-2.5 bg-gradient-to-br from-[#C1DFF0] to-[#CFE3DC] rounded-full shadow-sm mr-3">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-[#3C3C3C]">Daily Gratitude Practice</h2>
+              <p className="text-sm text-gray-500">Taking time to appreciate what you're thankful for</p>
+            </div>
+          </div>
+          <Link 
+            href="/journal/gratitude"
+            className="py-2.5 px-5 bg-[#3C3C3C] text-white rounded-lg hover:bg-[#3C3C3C]/90 transition-all duration-300 flex items-center text-sm font-medium"
+          >
+            <span>Go to Gratitude</span>
+            <svg className="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </Link>
+        </div>
+      </div>
       
       <div className="p-6 shadow-sm bg-white rounded-lg">
-
         <h2 className="text-2xl font-bold text-black mb-6">Your Mood Insights</h2>
 
         {/* Grid layout for charts */}
@@ -470,13 +492,10 @@ export default function JournalInsights() {
           </div>
         </div>
 
-        {/* Word Cloud Display - Add it here */}
+        {/* Word Cloud Display */}
         <div className="mb-6">
           <WordCloudDisplay />
         </div>
-        
-        {/* Gratitude History */}
-        <GratitudeHistory />
 
         {/* Common Patterns Section */}
         {insightsData?.commonPatterns && insightsData.commonPatterns.length > 0 && (
