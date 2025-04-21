@@ -16,6 +16,8 @@ import {
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import WordCloudDisplay from '../WordCloudDisplay'; // Import the WordCloudDisplay component
+import GratitudeForm from '../Gratitude/GratitudeForm';
+import GratitudeHistory from '../Gratitude/GratitudeHistory';
 
 // Register Chart.js components
 ChartJS.register(
@@ -356,6 +358,10 @@ export default function JournalInsights() {
           </div>
         </div>
       )}
+      
+      {/* Daily Gratitude Form */}
+      <GratitudeForm />
+      
       <div className="p-6 shadow-sm bg-white rounded-lg">
 
         <h2 className="text-2xl font-bold text-black mb-6">Your Mood Insights</h2>
@@ -468,6 +474,9 @@ export default function JournalInsights() {
         <div className="mb-6">
           <WordCloudDisplay />
         </div>
+        
+        {/* Gratitude History */}
+        <GratitudeHistory />
 
         {/* Common Patterns Section */}
         {insightsData?.commonPatterns && insightsData.commonPatterns.length > 0 && (
