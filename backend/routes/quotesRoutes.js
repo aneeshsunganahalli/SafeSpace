@@ -7,4 +7,6 @@ const router = express.Router();
 router.get('/random', getRandomQuote);
 router.get('/daily', getDailyQuote);
 
+// Make sure there are no malformed routes like router.get('/:') or router.get('/path/')
+
 export default router;
