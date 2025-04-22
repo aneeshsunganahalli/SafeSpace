@@ -5,7 +5,30 @@ import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import StreakMilestone from "../StreakMilestone";
 
-const moodOptions = [
+interface MoodOption {
+  value: string;
+  score: number;
+  label: string;
+}
+
+interface JournalEntry {
+  _id: string;
+  content: string;
+  mood: {
+    label: string;
+    score: number;
+  };
+  tags: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface JournalEntryFormProps {
+  existingEntry?: JournalEntry | null;
+  onSave?: (entry: JournalEntry) => void;
+}
+
+const moodOptions: MoodOption[] = [
   { value: "Very Negative", score: 1, label: "Very Negative 😢" },
   { value: "Negative", score: 3, label: "Negative 😕" },
   { value: "Neutral", score: 5, label: "Neutral 😐" },
@@ -16,10 +39,7 @@ const moodOptions = [
 export default function JournalEntryForm({ 
   existingEntry = null, 
   onSave 
-}: { 
-  existingEntry?: any, 
-  onSave?: (entry: any) => void 
-}) {
+}: JournalEntryFormProps) {
   const { token, updateUserStreak } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
