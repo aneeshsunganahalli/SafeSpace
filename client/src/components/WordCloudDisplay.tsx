@@ -75,7 +75,7 @@ export default function WordCloudDisplay() {
         .words(wordData.map(d => ({ text: d.text, size: fontSizeScale(d.value), value: d.value })))
         .padding(2) // Reduced padding to allow words to be closer together
         .rotate(() => (Math.random() > 0.8 ? 90 : 0)) // Reduce number of rotated words
-        .font('Inter')
+        .font('var(--font-inter)') // Updated to use font variable
         .fontSize(d => d.size || 16)
         .spiral('rectangular') // Use rectangular spiral for better space filling
         .on('end', (words: cloud.Word[]) => {
