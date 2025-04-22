@@ -15,9 +15,8 @@ const nextConfig = {
   // Environment variables that should be available at build time
   env: {
     NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL
-  },
-  // Improve output
-  output: 'standalone',
+  }
 };
 
-module.exports = nextConfig;
+// Use ES modules export syntax for .mjs files
+export default nextConfig;
