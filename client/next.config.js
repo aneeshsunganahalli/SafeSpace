@@ -1,6 +1,4 @@
-/**
- * @type {import('next').NextConfig}
- */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -18,5 +16,4 @@ const nextConfig = {
   }
 };
 
-// Use ES modules export syntax for .mjs files
-export default nextConfig;
+module.exports = nextConfig;
