@@ -1,7 +1,7 @@
 # SafeSpace 🧘‍♀️
 ## A Digital Sanctuary for Mental Wellness
 
-![SafeSpace Dashboard](https://via.placeholder.com/800x400?text=SafeSpace+Dashboard+Screenshot)
+![SafeSpace Dashboard](./assets/Home.png)
 
 *SafeSpace is a digital sanctuary designed to support your emotional wellness through reflective journaling, mood tracking, and personalized AI-powered insights.*
 
@@ -15,7 +15,7 @@ In today's fast-paced world, mental self-care often takes a backseat. SafeSpace 
 - **Track** your mental health journey over time
 - **Celebrate** your progress, no matter how small
 
-![Mood Tracking Visualization](https://via.placeholder.com/800x400?text=Mood+Tracking+Visualization)
+![Journal Entry Visualisation](./assets/JournalEntry.png)
 
 ## 🌟 Core Features
 
@@ -28,21 +28,20 @@ Visualize your emotional landscape with interactive charts that reveal patterns 
 ### AI Wellness Assistant
 Receive thoughtful, personalized reflections and gentle guidance based on your journal entries. Our AI companion offers perspective, suggests coping strategies, and celebrates your growth—all while respecting your privacy.
 
-![AI Insights Feature](https://via.placeholder.com/800x400?text=AI+Insights+Feature)
+![AI Insights Feature](./assets/Insights.png)
 
 ### Additional Features
 - **🔒 Privacy-First Design** — End-to-end encryption and robust security measures keep your thoughts private
 - **🔥 Journaling Streaks** — Build consistency with subtle habit-forming elements
 - **📱 Cross-Platform Access** — Seamlessly switch between devices without losing your flow
 - **☁️ Word Cloud Insights** — Visualize themes and patterns in your writing
-- **🌙 Light & Dark Themes** — Customize your experience for maximum comfort
 
 ## 💻 Technology Stack
 
 ### Frontend
 - **Framework:** Next.js with TypeScript
 - **UI Library:** React with Tailwind CSS
-- **State Management:** Redux Toolkit
+- **State Management:** Context API
 - **Authentication:** JWT with HttpOnly cookies
 - **Data Visualization:** D3.js and Chart.js
 
@@ -50,10 +49,9 @@ Receive thoughtful, personalized reflections and gentle guidance based on your j
 - **Runtime:** Node.js with Express.js
 - **Database:** MongoDB with Mongoose ODM
 - **API Architecture:** RESTful with middleware pattern
-- **AI Integration:** TensorFlow.js for on-device processing
+- **AI Integration:** Gemini 2.0 Flash
 - **Security:** bcrypt, helmet, CORS protection
 
-![Architecture Diagram](https://via.placeholder.com/800x400?text=SafeSpace+Architecture+Diagram)
 
 ## 🚀 Getting Started
 
