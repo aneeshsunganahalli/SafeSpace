@@ -25,13 +25,13 @@ export default function About() {
             <div className="md:w-1/2">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
               <p className="text-lg text-gray-600 mb-6">
-                At SafeSpace, we believe that everyone deserves access to tools that support 
-                their mental health journey. Our mission is to provide a secure, judgment-free 
-                environment where individuals can express themselves, track their emotional 
+                At SafeSpace, we believe that everyone deserves access to tools that support
+                their mental health journey. Our mission is to provide a secure, judgment-free
+                environment where individuals can express themselves, track their emotional
                 patterns, and gain actionable insights.
               </p>
               <p className="text-lg text-gray-600">
-                Through technology and compassionate design, we aim to make mental health 
+                Through technology and compassionate design, we aim to make mental health
                 self-care accessible, engaging, and effective for people from all walks of life.
               </p>
             </div>
@@ -71,7 +71,7 @@ export default function About() {
               </div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900">Intuitive Journal</h3>
               <p className="text-gray-600 mb-4">
-                Express your thoughts freely in our clean, distraction-free writing environment. 
+                Express your thoughts freely in our clean, distraction-free writing environment.
                 Add mood ratings and tags to track patterns in your emotional wellbeing over time.
               </p>
               <div className="flex items-center pt-2">
@@ -93,7 +93,7 @@ export default function About() {
               </div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900">Mood Tracking</h3>
               <p className="text-gray-600 mb-4">
-                Visualize your emotional patterns with our interactive charts. Identify trends, 
+                Visualize your emotional patterns with our interactive charts. Identify trends,
                 triggers, and improvements in your mental wellbeing at a glance.
               </p>
               <div className="flex items-center pt-2">
@@ -115,7 +115,7 @@ export default function About() {
               </div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900">AI-Powered Insights</h3>
               <p className="text-gray-600 mb-4">
-                Receive thoughtful analysis of your journal entries, with personalized suggestions 
+                Receive thoughtful analysis of your journal entries, with personalized suggestions
                 for coping strategies and mindfulness exercises tailored to your needs.
               </p>
               <div className="flex items-center pt-2">
@@ -134,12 +134,12 @@ export default function About() {
             <div className="md:w-1/2">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Building Healthy Habits</h2>
               <p className="text-lg text-gray-600 mb-6">
-                We've integrated subtle gamification elements to help you build a consistent 
-                journaling practice. Your streak counter shows how many consecutive days you've 
+                We've integrated subtle gamification elements to help you build a consistent
+                journaling practice. Your streak counter shows how many consecutive days you've
                 journaled, encouraging regular reflection.
               </p>
               <p className="text-lg text-gray-600">
-                Milestone achievements celebrate your dedication to self-care, while our word cloud 
+                Milestone achievements celebrate your dedication to self-care, while our word cloud
                 visualizations help you identify recurring themes in your journal entries.
               </p>
             </div>
@@ -180,12 +180,12 @@ export default function About() {
             <div className="md:w-1/2">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Visualize Your Thoughts</h2>
               <p className="text-lg text-gray-600 mb-6">
-                Our word cloud feature helps you visualize the themes and topics that appear most 
-                frequently in your journal. This can provide valuable insights into what's occupying 
+                Our word cloud feature helps you visualize the themes and topics that appear most
+                frequently in your journal. This can provide valuable insights into what's occupying
                 your mind and what matters most to you.
               </p>
               <p className="text-lg text-gray-600">
-                Over time, you might notice shifts in these patterns as your focus and emotional 
+                Over time, you might notice shifts in these patterns as your focus and emotional
                 state evolve—another powerful way to track your personal growth.
               </p>
             </div>
@@ -223,8 +223,8 @@ export default function About() {
               </div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900">Secure and Private</h3>
               <p className="text-gray-600">
-                Your journal entries are encrypted and accessible only to you. We implement 
-                industry-standard security practices to ensure that your personal thoughts 
+                Your journal entries are encrypted and accessible only to you. We implement
+                industry-standard security practices to ensure that your personal thoughts
                 remain confidential and protected.
               </p>
             </div>
@@ -237,8 +237,8 @@ export default function About() {
               </div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900">Data Transparency</h3>
               <p className="text-gray-600">
-                We're committed to transparency about how your data is used. Your information 
-                is never sold to third parties, and you maintain complete control over your content. 
+                We're committed to transparency about how your data is used. Your information
+                is never sold to third parties, and you maintain complete control over your content.
                 You can export or delete your data at any time.
               </p>
             </div>
@@ -256,8 +256,7 @@ export default function About() {
             SafeSpace was created by a dedicated team passionate about mental health, technology, and user experience.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Team Member 1 */}
+          <div className="flex items-center justify-center gap-8 flex-wrap">
             <div className="bg-white p-6 rounded-xl shadow-md text-center">
               <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4">
                 <div className="w-full h-full rounded-full flex items-center justify-center">
@@ -266,58 +265,10 @@ export default function About() {
                   </svg>
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Sarah Johnson</h3>
-              <p className="text-sm text-gray-500 mb-3">Founder & CEO</p>
-              <p className="text-sm text-gray-600">
-                Mental health advocate with a background in psychology and technology.
-              </p>
-            </div>
-
-            {/* Team Member 2 */}
-            <div className="bg-white p-6 rounded-xl shadow-md text-center">
-              <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4">
-                <div className="w-full h-full rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">Michael Chen</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Aneesh Sunganahalli</h3>
               <p className="text-sm text-gray-500 mb-3">Lead Developer</p>
               <p className="text-sm text-gray-600">
                 Full-stack engineer with a passion for creating tools that make a difference.
-              </p>
-            </div>
-
-            {/* Team Member 3 */}
-            <div className="bg-white p-6 rounded-xl shadow-md text-center">
-              <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4">
-                <div className="w-full h-full rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">Emily Rodriguez</h3>
-              <p className="text-sm text-gray-500 mb-3">UX Designer</p>
-              <p className="text-sm text-gray-600">
-                User experience specialist focused on creating calming digital environments.
-              </p>
-            </div>
-
-            {/* Team Member 4 */}
-            <div className="bg-white p-6 rounded-xl shadow-md text-center">
-              <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4">
-                <div className="w-full h-full rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">David Kim</h3>
-              <p className="text-sm text-gray-500 mb-3">Clinical Advisor</p>
-              <p className="text-sm text-gray-600">
-                Licensed therapist ensuring our approach aligns with best mental health practices.
               </p>
             </div>
           </div>
@@ -329,7 +280,7 @@ export default function About() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">Begin Your Journey Today</h2>
           <p className="text-lg text-gray-200 mb-8 max-w-2xl mx-auto">
-            Join thousands of users who are taking control of their mental wellbeing through 
+            Join thousands of users who are taking control of their mental wellbeing through
             reflective journaling with SafeSpace.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
